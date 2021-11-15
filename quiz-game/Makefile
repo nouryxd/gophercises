@@ -1,8 +1,8 @@
 build:
-	cd cmd && go build -o Quiz
+	go build -o Quiz
 
 run:
-	cd cmd && ./Quiz
+	./Quiz
 
 xd:
-	cd cmd && go build -o Quiz && ./Quiz
+	go build -o Quiz && ./Quiz

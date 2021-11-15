@@ -5,8 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-
-	"github.com/lyx0/gophercises/quiz-game/pkg/parser"
 )
 
 func main() {
@@ -16,22 +14,41 @@ func main() {
 	file, err := os.Open(*csvFilename)
 	if err != nil {
 
-		exit(fmt.Sprintln("Failed to open the csv file"))
+		fmt.Printf("Failed to open the csv file: %s", *csvFilename)
 		os.Exit(1)
 	}
+
 	r := csv.NewReader(file)
 	lines, err := r.ReadAll()
 	if err != nil {
 		exit("Error while reading the csv file")
 	}
 
-	problems := parser.ParseLines(lines)
+	problems := parseLines(lines)
 
 	for i, p := range problems {
 		fmt.Printf("Problem #%d: %s\n", i+1, p.Question)
 
 	}
 
+}
+
+func parseLines(lines [][]string) []problem {
+	ret := make([]problem, len(lines))
+
+	for i, line := range lines {
+		ret[i] = problem{
+			Question: line[0],
+			Answer:   line[1],
+		}
+	}
+
+	return ret
+}
+
+type problem struct {
+	Question string
+	Answer   string
 }
 
 func exit(msg string) {
