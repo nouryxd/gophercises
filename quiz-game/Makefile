@@ -2,7 +2,7 @@ build:
 	go build -o Quiz
 
 run:
-	./Quiz
+	./Quiz -limit=30
 
 xd:
 	go build -o Quiz && ./Quiz
