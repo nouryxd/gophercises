@@ -3,7 +3,44 @@ package cyoa
 import (
 	"encoding/json"
 	"io"
+	"net/http"
 )
+
+var defaultHandlerTmpl = `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Choose Your Own Adventure</title>
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+
+  <body>
+    <h1>{{.Title}}</h1>
+
+      {{range .Paragraphs}}
+        <p>{{.}}</p>
+      {{end}}
+        
+        {{if .Options}}
+          <ul>
+            {{range .Options}}
+              <li><a href="/story/{{.Chapter}}">{{.Text}}</a></li>
+            {{end}}
+          </ul>
+        {{else}}
+          <h3>The End</h3>
+        {{end}}
+  </body>
+</html>
+`
+
+func NewHandler(s Story) http.Handler {
+	//t := template.Must(template.New("").Parse(defaultHandlerTmpl))
+}
+
+type handler struct {
+}
 
 func JsonStory(r io.Reader) (Story, error) {
 	d := json.NewDecoder(r)
@@ -25,5 +62,5 @@ type Chapter struct {
 
 type Option struct {
 	Text    string `json:"text"`
-	Chapter string `json:"arc"`
+	Chapter string `json:"chapter"`
 }
