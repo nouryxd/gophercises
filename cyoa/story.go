@@ -34,7 +34,7 @@ var defaultHandlerTmpl = `
         {{if .Options}}
           <ul>
             {{range .Options}}
-              <li><a href="/story/{{.Chapter}}">{{.Text}}</a></li>
+              <li><a href="/{{.Chapter}}">{{.Text}}</a></li>
             {{end}}
           </ul>
         {{else}}
@@ -92,5 +92,5 @@ type Chapter struct {
 
 type Option struct {
 	Text    string `json:"text"`
-	Chapter string `json:"chapter"`
+	Chapter string `json:"arc"`
 }
