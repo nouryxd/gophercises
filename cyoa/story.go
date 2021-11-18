@@ -2,9 +2,16 @@ package cyoa
 
 import (
 	"encoding/json"
+	"html/template"
 	"io"
 	"net/http"
 )
+
+func init() {
+	tpl = template.Must(template.New("").Parse(defaultHandlerTmpl))
+}
+
+var tpl *template.Template
 
 var defaultHandlerTmpl = `
 <!DOCTYPE html>
@@ -36,10 +43,18 @@ var defaultHandlerTmpl = `
 `
 
 func NewHandler(s Story) http.Handler {
-	//t := template.Must(template.New("").Parse(defaultHandlerTmpl))
+	return handler{s}
 }
 
 type handler struct {
+	s Story
+}
+
+func (h handler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+	err := tpl.Execute(rw, h.s["intro"])
+	if err != nil {
+		panic(err)
+	}
 }
 
 func JsonStory(r io.Reader) (Story, error) {
