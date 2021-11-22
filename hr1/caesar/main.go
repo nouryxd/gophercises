@@ -1,39 +1,35 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func main() {
 	var length, delta int
 	var input string
 	fmt.Scanf("%d\n", &length)
-	fmt.Scanf("%d\n", &input)
+	fmt.Scanf("%s\n", &input)
 	fmt.Scanf("%d\n", &delta)
 
-	//	fmt.Printf("length: %d\n", length)
-	//	fmt.Printf("input: %s\n", input)
-	//	fmt.Printf("delta: %d\n", delta)
-
-	alphabet := []rune("abcdefghijklmnopqrstuvwxyz")
-	newRune := rotate('z', 2, alphabet)
-	fmt.Println(string(newRune))
+	var ret []rune
+	for _, ch := range input {
+		ret = append(ret, cipher(ch, delta))
+	}
+	fmt.Println(string(ret))
 }
 
-func rotate(s rune, delta int, key []rune) rune {
-	idx := -1
-	for i, r := range key {
-		if r == s {
-			idx = i
-			break
-		}
+func cipher(r rune, delta int) rune {
+	if r >= 'A' && r <= 'Z' {
+		return rotate(r, 'A', delta)
 	}
-	if idx < 0 {
-		panic("idx less than 0")
+	if r >= 'a' && r <= 'z' {
+		return rotate(r, 'a', delta)
 	}
-	for i := 0; i < delta; i++ {
-		idx++
-		if idx >= len(key) {
-			idx = 0
-		}
-	}
-	return key[idx]
+	return r
+}
+
+func rotate(r rune, base, delta int) rune {
+	tmp := int(r) - base
+	tmp = (tmp + delta) % 26
+	return rune(tmp + base)
 }
