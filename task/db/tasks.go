@@ -8,7 +8,6 @@ import (
 )
 
 var taskBucket = []byte("tasks")
-
 var db *bolt.DB
 
 type Task struct {
@@ -17,16 +16,15 @@ type Task struct {
 }
 
 func Init(dbPath string) error {
-	db, err := bolt.Open(dbPath, 0600, &bolt.Options{Timeout: 1 * time.Second})
+	var err error
+	db, err = bolt.Open(dbPath, 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		return err
 	}
-
 	return db.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists(taskBucket)
 		return err
 	})
-
 }
 
 func CreateTask(task string) (int, error) {
@@ -57,11 +55,9 @@ func AllTasks() ([]Task, error) {
 		}
 		return nil
 	})
-
 	if err != nil {
 		return nil, err
 	}
-
 	return tasks, nil
 }
 
