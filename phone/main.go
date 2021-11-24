@@ -31,13 +31,24 @@ func main() {
 	must(err)
 	defer db.Close()
 
-	must(db.Ping())
+	// must(db.Ping())
+	must(createPhoneNumbersTable(db))
 }
 
 func must(err error) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func createPhoneNumbersTable(db *sql.DB) error {
+	statement := `
+		CREATE TABLE IF NOT EXISTS phone_numbers (
+			id SERIAL, 
+			value VARCHAR(255)
+		)`
+	_, err := db.Exec(statement)
+	return err
 }
 
 func resetDB(db *sql.DB, name string) error {
