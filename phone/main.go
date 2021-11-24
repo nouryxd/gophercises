@@ -1,6 +1,62 @@
 package main
 
-import "regexp"
+import (
+	"database/sql"
+	"fmt"
+	"regexp"
+
+	_ "github.com/lib/pq"
+)
+
+const (
+	host = "localhost"
+	port = 5432
+	user = "lyx0"
+	// password = ""
+	dbname = "gophercises_phone"
+)
+
+func main() {
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s sslmode=disable", host, port, user)
+	db, err := sql.Open("postgres", psqlInfo)
+	must(err)
+
+	err = resetDB(db, dbname)
+	must(err)
+
+	db.Close()
+
+	psqlInfo = fmt.Sprintf("%s dbname=%s", psqlInfo, dbname)
+	db, err = sql.Open("postgres", psqlInfo)
+	must(err)
+	defer db.Close()
+
+	must(db.Ping())
+}
+
+func must(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
+func resetDB(db *sql.DB, name string) error {
+	_, err := db.Exec("DROP DATABASE IF EXISTS " + name)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("DROPPED database: %s\n", name)
+	return createDB(db, name)
+}
+
+func createDB(db *sql.DB, name string) error {
+	_, err := db.Exec("CREATE DATABASE " + name)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("CREATED database: %s\n", name)
+	return nil
+}
 
 func normalize(phone string) string {
 	re := regexp.MustCompile("[^0-9]")
