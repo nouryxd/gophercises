@@ -1,4 +1,4 @@
-package phonedb
+package db
 
 import (
 	"database/sql"
