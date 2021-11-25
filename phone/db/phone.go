@@ -3,6 +3,8 @@ package db
 import (
 	"database/sql"
 	"fmt"
+
+	_ "github.com/lib/pq"
 )
 
 // Phone represents the phone_numbers table in the database
@@ -77,6 +79,32 @@ func (db *DB) AllPhones() ([]Phone, error) {
 		return nil, err
 	}
 	return ret, nil
+}
+
+func (db *DB) FindPhone(number string) (*Phone, error) {
+	var p Phone
+	row := db.db.QueryRow("SELECT * FROM phone_numbers WHERE value=$1", number)
+	err := row.Scan(&p.ID, &p.Number)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		} else {
+			return nil, err
+		}
+	}
+	return &p, nil
+}
+
+func (db *DB) UpdatePhone(p *Phone) error {
+	statement := `UPDATE phone_numbers SET value=$2 WHERE id=$1`
+	_, err := db.db.Exec(statement, p.ID, p.Number)
+	return err
+}
+
+func (db *DB) DeletePhone(id int) error {
+	statement := `DELETE FROM phone_numbers WHERE id=$1`
+	_, err := db.db.Exec(statement, id)
+	return err
 }
 
 func Migrate(driverName, dataSource string) error {
