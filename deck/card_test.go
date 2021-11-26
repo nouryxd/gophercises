@@ -58,7 +58,6 @@ func TestShuffle(t *testing.T) {
 	if cards[1] != second {
 		t.Errorf("Expected the second card to be %s, received %s.", second, cards[1])
 	}
-
 }
 
 func TestSort(t *testing.T) {
