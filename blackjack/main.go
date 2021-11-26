@@ -42,6 +42,9 @@ func main() {
 			card, cards = draw(cards)
 			player = append(player, card)
 		}
+		fmt.Println("=====FINAL HANDS=====")
+		fmt.Println("Player:", player)
+		fmt.Println("Dealer:", dealer)
 
 	}
 
