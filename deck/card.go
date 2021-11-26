@@ -102,5 +102,5 @@ func Shuffle(cards []Card) []Card {
 	for i, j := range perm {
 		ret[i] = cards[j]
 	}
-
+	return ret
 }
