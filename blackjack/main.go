@@ -94,20 +94,43 @@ func Hit(gs GameState) GameState {
 func EndHand(gs GameState) GameState {
 	ret := clone(gs)
 	pScore, dScore := ret.Player.Score(), ret.Dealer.Score()
-	fmt.Println("=====FINAL HANDS=====")
+	fmt.Println("===== FINAL HANDS =====")
+	fmt.Printf("\n")
 	fmt.Println("Player:", ret.Player, "\nScore:", pScore)
 	fmt.Println("Dealer:", ret.Dealer, "\nScore:", dScore)
 	switch {
 	case pScore > 21:
-		fmt.Println("You busted")
+		fmt.Printf("\n")
+		fmt.Println("------------------")
+		fmt.Println("--- You busted ---")
+		fmt.Println("---- You lose ----")
+		fmt.Println("------------------")
+		fmt.Printf("\n\n\n")
 	case dScore > 21:
-		fmt.Println("Dealer busted")
+		fmt.Printf("\n")
+		fmt.Println("---------------------")
+		fmt.Println("--- Dealer busted ---")
+		fmt.Println("------ You win ------")
+		fmt.Println("---------------------")
+		fmt.Printf("\n\n\n")
 	case pScore > dScore:
-		fmt.Println("You win")
+		fmt.Printf("\n")
+		fmt.Println("---------------")
+		fmt.Println("--- You win ---")
+		fmt.Println("---------------")
+		fmt.Printf("\n\n\n")
 	case dScore > pScore:
-		fmt.Println("You lose")
+		fmt.Printf("\n")
+		fmt.Println("----------------")
+		fmt.Println("--- You lose ---")
+		fmt.Println("----------------")
+		fmt.Printf("\n\n\n")
 	case dScore == pScore:
-		fmt.Println("Draw")
+		fmt.Printf("\n")
+		fmt.Println("------------")
+		fmt.Println("--- Draw ---")
+		fmt.Println("------------")
+		fmt.Printf("\n\n\n")
 	}
 	fmt.Println()
 
@@ -120,37 +143,40 @@ func EndHand(gs GameState) GameState {
 func main() {
 	var gs GameState
 	gs = Shuffle(gs)
-	gs = Deal(gs)
+	for i := 0; i < 10; i++ {
+		gs = Deal(gs)
 
-	var input string
-	for gs.State == StatePlayerTurn {
-		fmt.Println("Player: ", gs.Player)
-		fmt.Println("Dealer: ", gs.Dealer.DealerString())
-		fmt.Printf("Your cards are worth %d\n", gs.Player.Score())
-		fmt.Println("What will you do? (h)it, (s)tand")
-		fmt.Scanf("%s\n", &input)
-		switch input {
-		case "h":
-			gs = Hit(gs)
-		case "s":
-			gs = Stand(gs)
-		default:
-			fmt.Println("Invalid option:", input)
+		var input string
+		for gs.State == StatePlayerTurn {
+			fmt.Println("Player: ", gs.Player)
+			fmt.Println("Dealer: ", gs.Dealer.DealerString())
+			fmt.Printf("Your cards are worth %d\n", gs.Player.Score())
+			fmt.Println("What will you do? (h)it, (s)tand")
+			fmt.Scanf("%s\n", &input)
+			fmt.Printf("\n")
+			switch input {
+			case "h":
+				gs = Hit(gs)
+			case "s":
+				gs = Stand(gs)
+			default:
+				fmt.Println("Invalid option:", input)
+			}
 		}
-	}
 
-	// If dealer score <= 16, we hit
-	// If dealer has a soft 17, then we hit. (Ace as
-	// 11 points and 16 points)
-	for gs.State == StateDealerTurn {
-		if gs.Dealer.Score() <= 16 || (gs.Dealer.Score() == 17 && gs.Dealer.MinScore() != 17) {
-			gs = Hit(gs)
-		} else {
-			gs = Stand(gs)
+		// If dealer score <= 16, we hit
+		// If dealer has a soft 17, then we hit. (Ace as
+		// 11 points and 16 points)
+		for gs.State == StateDealerTurn {
+			if gs.Dealer.Score() <= 16 || (gs.Dealer.Score() == 17 && gs.Dealer.MinScore() != 17) {
+				gs = Hit(gs)
+			} else {
+				gs = Stand(gs)
+			}
 		}
-	}
 
-	gs = EndHand(gs)
+		gs = EndHand(gs)
+	}
 
 }
 
