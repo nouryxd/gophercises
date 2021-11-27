@@ -7,6 +7,9 @@ import (
 )
 
 type AI interface {
+	Bet() int
+	Play(hand []deck.Card, dealer deck.Card) Move
+	Results(hand [][]deck.Card, dealer []deck.Card)
 }
 
 type HumanAI struct{}
@@ -27,6 +30,16 @@ func (ai *HumanAI) Play(hand []deck.Card, dealer deck.Card) Move {
 			fmt.Println("Invalid option:", input)
 		}
 	}
+}
+
+func (ai *HumanAI) Bet() int {
+	return 1
+}
+
+func (ai *HumanAI) Results(hand [][]deck.Card, dealer []deck.Card) {
+	fmt.Println("===== FINAL HANDS =====")
+	fmt.Println("Player:", hand)
+	fmt.Println("Dealer:", dealer)
 }
 
 type Move func(GameState) GameState
