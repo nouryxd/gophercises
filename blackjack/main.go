@@ -73,9 +73,22 @@ func main() {
 			card, cards = draw(cards)
 			player = append(player, card)
 		}
-		fmt.Println("=====FINAL HANDS=====")
-		fmt.Println("Player:", player, "\nScore:", player.Score())
-		fmt.Println("Dealer:", dealer, "\nScore:", dealer.Score())
+	}
+	pScore, dScore := player.Score(), dealer.Score()
+	fmt.Println("=====FINAL HANDS=====")
+	fmt.Println("Player:", player, "\nScore:", pScore)
+	fmt.Println("Dealer:", dealer, "\nScore:", dScore)
+	switch {
+	case pScore > 21:
+		fmt.Println("You busted")
+	case dScore > 21:
+		fmt.Println("Dealer busted")
+	case pScore > dScore:
+		fmt.Println("You win")
+	case dScore > pScore:
+		fmt.Println("You lose")
+	case dScore == pScore:
+		fmt.Println("Draw")
 
 	}
 
