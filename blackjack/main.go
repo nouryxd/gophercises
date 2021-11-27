@@ -126,6 +126,7 @@ func main() {
 	for gs.State == StatePlayerTurn {
 		fmt.Println("Player: ", gs.Player)
 		fmt.Println("Dealer: ", gs.Dealer.DealerString())
+		fmt.Printf("Your cards are worth %d\n", gs.Player.Score())
 		fmt.Println("What will you do? (h)it, (s)tand")
 		fmt.Scanf("%s\n", &input)
 		switch input {
