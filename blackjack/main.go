@@ -111,13 +111,18 @@ func main() {
 			fmt.Println("Invalid option:", input)
 		}
 	}
+
 	// If dealer score <= 16, we hit
 	// If dealer has a soft 17, then we hit. (Ace as
 	// 11 points and 16 points)
-	for dealer.Score() <= 16 || (dealer.Score() == 17 && dealer.MinScore() != 17) {
-		card, cards = draw(cards)
-		dealer = append(dealer, card)
+	for gs.State == StateDealerTurn {
+		if gs.Dealer.Score() <= 16 || (gs.Dealer.Score() == 17 && gs.Dealer.MinScore() != 17) {
+			gs = Hit(gs)
+		} else {
+			gs = Stand(gs)
+		}
 	}
+
 	pScore, dScore := player.Score(), dealer.Score()
 	fmt.Println("=====FINAL HANDS=====")
 	fmt.Println("Player:", player, "\nScore:", pScore)
