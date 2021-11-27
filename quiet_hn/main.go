@@ -53,7 +53,7 @@ func handler(numStories int, tpl *template.Template) http.HandlerFunc {
 		}
 		data := templateData{
 			Stories: stories,
-			Time:    time.Now().Sub(start),
+			Time:    time.Since(start),
 		}
 		err = tpl.Execute(w, data)
 		if err != nil {
