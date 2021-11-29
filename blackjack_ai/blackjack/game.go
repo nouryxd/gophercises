@@ -1,8 +1,6 @@
 package blackjack
 
 import (
-	"fmt"
-
 	"github.com/lyx0/gophercises/deck"
 )
 
@@ -98,23 +96,23 @@ func (g *Game) Play(ai AI) int {
 			shuffled = true
 		}
 		bet(g, ai, shuffled)
-
 		deal(g)
-
+		if Blackjack(g.dealer...) {
+			endHand(g, ai)
+			continue
+		}
 		for g.state == statePlayerTurn {
 			hand := make([]deck.Card, len(g.player))
 			copy(hand, g.player)
 			move := ai.Play(hand, g.dealer[0])
 			move(g)
 		}
-
 		for g.state == stateDealerTurn {
 			hand := make([]deck.Card, len(g.dealer))
 			copy(hand, g.dealer)
 			move := g.dealerAI.Play(hand, g.dealer[0])
 			move(g)
 		}
-
 		endHand(g, ai)
 	}
 	return g.balance
@@ -142,28 +140,28 @@ func draw(cards []deck.Card) (deck.Card, []deck.Card) {
 
 func endHand(g *Game, ai AI) {
 	pScore, dScore := Score(g.player...), Score(g.dealer...)
+	pBlackjack, dBlackjack := Blackjack(g.player...), Blackjack(g.dealer...)
 	winnings := g.playerBet
 	switch {
+	case pBlackjack && dBlackjack:
+		winnings = 0
+	case dBlackjack:
+		winnings = -winnings
+	case pBlackjack:
+		winnings = int(float64(winnings) * g.blackjackPayout)
 	case pScore > 21:
-		fmt.Println("You busted")
 		winnings *= -1
 	case dScore > 21:
-		fmt.Println("Dealer busted")
-		g.balance++
+		// noop - win
 	case pScore > dScore:
-		fmt.Println("You win!")
-		g.balance++
+		// win
 	case dScore > pScore:
-		fmt.Println("You lose")
 		winnings *= -1
-		g.balance--
 	case dScore == pScore:
-		fmt.Println("Draw")
 		winnings = 0
 	}
 
 	g.balance += winnings
-	fmt.Println()
 	ai.Results([][]deck.Card{g.player}, g.dealer)
 	g.player = nil
 	g.dealer = nil
@@ -192,6 +190,12 @@ func Soft(hand ...deck.Card) bool {
 	minScore := minScore(hand...)
 	score := Score(hand...)
 	return minScore != score
+}
+
+// Blackjack returns true if a hand is a blackjack.
+func Blackjack(hand ...deck.Card) bool {
+	return len(hand) == 2 && Score(hand...) == 21
+
 }
 
 func minScore(hand ...deck.Card) int {
