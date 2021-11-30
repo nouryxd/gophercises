@@ -2,20 +2,32 @@ package main
 
 import (
 	"fmt"
-	"os"
+	"io/ioutil"
 	"strconv"
 	"strings"
 )
 
 func main() {
-	fileName := "birthday_001.txt"
-	// => Birthday - 1 of 4.txt
-	newName, err := match(fileName, 4)
+	// 	fileName := "birthday_001.txt"
+	// 	// => Birthday - 1 of 4.txt
+	// 	newName, err := match(fileName, 4)
+	// 	if err != nil {
+	// 		fmt.Println("no match")
+	// 		os.Exit(1)
+	// 	}
+	// 	fmt.Println(newName)
+	files, err := ioutil.ReadDir("./sample")
 	if err != nil {
-		fmt.Println("no match")
-		os.Exit(1)
+		panic(err)
 	}
-	fmt.Println(newName)
+	for _, file := range files {
+		if file.IsDir() {
+			fmt.Println("Dir: ", file.Name())
+		} else {
+			tmp, err := match(file.Name(), 4)
+			fmt.Println("match: ", tmp, err)
+		}
+	}
 }
 
 func match(fileName string, total int) (string, error) {
