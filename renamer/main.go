@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 )
 
 func main() {
@@ -17,7 +19,17 @@ func main() {
 }
 
 func match(fileName string) (string, error) {
-	// "birthday", "001", "txt"
+	pieces := strings.Split(fileName, ".")
+	ext := pieces[len(pieces)-1]
+	tmp := strings.Join(pieces[0:len(pieces)-1], ".")
+	pieces = strings.Split(tmp, "_")
+	name := strings.Join(pieces[0:len(pieces)-1], "_")
+	number, err := strconv.Atoi(pieces[len(pieces)-1])
+	if err != nil {
+		return "", fmt.Errorf("%s didn't match our patter", tmp)
+	}
+	// Birthday - 1 .txt
+	return fmt.Sprintf("%s - %d.%s", strings.Title(name), number, ext), nil
 
 	return "", nil
 }
