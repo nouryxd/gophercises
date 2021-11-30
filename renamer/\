@@ -1,0 +1,10 @@
+package main
+
+func main() {
+	fileName := "birthday_001.txt"
+	// => Birthday - 1 of 4.txt
+}
+
+func match(fileName string) (string, error) {
+	return "", nil
+}
