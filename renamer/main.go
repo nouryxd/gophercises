@@ -16,29 +16,53 @@ func main() {
 	// 		os.Exit(1)
 	// 	}
 	// 	fmt.Println(newName)
-	files, err := ioutil.ReadDir("./sample")
+	dir := "./sample"
+	files, err := ioutil.ReadDir(dir)
 	if err != nil {
 		panic(err)
 	}
+	count := 0
+	type rename struct {
+		filename string
+		path     string
+	}
+	var toRename []struct {
+		filename string
+		path     string
+	}
 	for _, file := range files {
 		if file.IsDir() {
-			fmt.Println("Dir: ", file.Name())
 		} else {
-			tmp, err := match(file.Name(), 4)
-			fmt.Println("match: ", tmp, err)
+			_, err := match(file.Name(), 0)
+			if err == nil {
+				count++
+				toRename = append(toRename, rename{
+					filename: file.Name(),
+					path:     fmt.Sprintf("%s/%s", dir, file.Name()),
+				})
+			}
 		}
 	}
+	for _, orig := range toRename {
+		newFilename, err := match(orig.filename, count)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("mv %s => %s", orig.path, newFilename)
+	}
+	// origPath := fmt.Sprintf("%s/%s")
+	// newPath := fmt.Sprintf("%s/%s")
 }
 
-func match(fileName string, total int) (string, error) {
-	pieces := strings.Split(fileName, ".")
+func match(filename string, total int) (string, error) {
+	pieces := strings.Split(filename, ".")
 	ext := pieces[len(pieces)-1]
 	tmp := strings.Join(pieces[0:len(pieces)-1], ".")
 	pieces = strings.Split(tmp, "_")
 	name := strings.Join(pieces[0:len(pieces)-1], "_")
 	number, err := strconv.Atoi(pieces[len(pieces)-1])
 	if err != nil {
-		return "", fmt.Errorf("%s didn't match our patter", tmp)
+		return "", fmt.Errorf("%s didn't match our patter", filename)
 	}
 	// Birthday - 1 .txt
 	return fmt.Sprintf("%s - %d of %d.%s", strings.Title(name), number, total, ext), nil
