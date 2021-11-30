@@ -10,7 +10,7 @@ import (
 func main() {
 	fileName := "birthday_001.txt"
 	// => Birthday - 1 of 4.txt
-	newName, err := match(fileName)
+	newName, err := match(fileName, 4)
 	if err != nil {
 		fmt.Println("no match")
 		os.Exit(1)
@@ -18,7 +18,7 @@ func main() {
 	fmt.Println(newName)
 }
 
-func match(fileName string) (string, error) {
+func match(fileName string, total int) (string, error) {
 	pieces := strings.Split(fileName, ".")
 	ext := pieces[len(pieces)-1]
 	tmp := strings.Join(pieces[0:len(pieces)-1], ".")
@@ -29,7 +29,7 @@ func match(fileName string) (string, error) {
 		return "", fmt.Errorf("%s didn't match our patter", tmp)
 	}
 	// Birthday - 1 .txt
-	return fmt.Sprintf("%s - %d.%s", strings.Title(name), number, ext), nil
+	return fmt.Sprintf("%s - %d of %d.%s", strings.Title(name), number, total, ext), nil
 
 	return "", nil
 }
