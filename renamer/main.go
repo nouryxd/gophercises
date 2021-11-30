@@ -48,7 +48,8 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println("mv %s => %s", orig.path, newFilename)
+		newPath := fmt.Sprintf("%s/%s", dir, newFilename)
+		fmt.Println("mv %s => %s", orig.path, newPath)
 	}
 	// origPath := fmt.Sprintf("%s/%s")
 	// newPath := fmt.Sprintf("%s/%s")
