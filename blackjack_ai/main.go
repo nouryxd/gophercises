@@ -23,9 +23,9 @@ func (ai *basicAI) Bet(shuffled bool) int {
 	// fmt.Printf("True Score: %d\n\n", trueScore)
 	switch {
 	case trueScore >= 14:
-		return 10000
+		return 10000000
 	case trueScore >= 8:
-		return 500
+		return 50000
 	default:
 		return 100
 	}
