@@ -56,13 +56,25 @@ func getTopStories(numStories int) ([]item, error) {
 	}
 	var stories []item
 	for _, id := range ids {
-		hnItem, err := client.GetItem(id)
-		if err != nil {
+		type result struct {
+			item item
+			err  error
+		}
+		resultCh := make(chan result)
+		go func(id int) {
+			hnItem, err := client.GetItem(id)
+			if err != nil {
+				resultCh <- result{err: err}
+			}
+			resultCh <- result{item: parseHNItem(hnItem)}
+		}(id)
+
+		res := <-resultCh
+		if res.err != nil {
 			continue
 		}
-		item := parseHNItem(hnItem)
-		if isStoryLink(item) {
-			stories = append(stories, item)
+		if isStoryLink(res.item) {
+			stories = append(stories, res.item)
 			if len(stories) >= numStories {
 				break
 			}
