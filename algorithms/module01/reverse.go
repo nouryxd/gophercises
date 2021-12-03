@@ -7,5 +7,11 @@ package module01
 //   Reverse("alphabet") => "tebahpla"
 //
 func Reverse(word string) string {
-	return ""
+	n := len(word)
+	runes := make([]rune, n)
+	for _, rune := range word {
+		n--
+		runes[n] = rune
+	}
+	return string(runes[n:])
 }
