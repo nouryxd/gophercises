@@ -67,7 +67,6 @@ func getTopStories(numStories int) ([]item, error) {
 }
 
 func getStories(ids []int) []item {
-	var client hn.Client
 	type result struct {
 		idx  int
 		item item
@@ -76,6 +75,7 @@ func getStories(ids []int) []item {
 	resultCh := make(chan result)
 	for i := 0; i < len(ids); i++ {
 		go func(idx, id int) {
+			var client hn.Client
 			hnItem, err := client.GetItem(id)
 			if err != nil {
 				resultCh <- result{idx: idx, err: err}
