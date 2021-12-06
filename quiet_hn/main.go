@@ -34,17 +34,35 @@ func main() {
 func handler(numStories int, tpl *template.Template) http.HandlerFunc {
 	sc := storyCache{
 		numStories: numStories,
-		duration:   3 * time.Second,
+		duration:   6 * time.Second,
 	}
+
+	go func() {
+		ticker := time.NewTicker(3 * time.Second)
+		for {
+			temp := storyCache{
+				numStories: numStories,
+				duration:   6 * time.Second,
+			}
+			temp.stories()
+			sc.mutex.Lock()
+			sc.cache = temp.cache
+			sc.expiration = temp.expiration
+			sc.mutex.Unlock()
+			<-ticker.C
+		}
+	}()
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		stories, err := sc.stories()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		data := templateData{
 			Stories: stories,
-			Time:    time.Since(start),
+			Time:    time.Now().Sub(start),
 		}
 		err = tpl.Execute(w, data)
 		if err != nil {
@@ -55,45 +73,34 @@ func handler(numStories int, tpl *template.Template) http.HandlerFunc {
 }
 
 type storyCache struct {
-	numStories     int
-	cacheA, cacheB []item
-	useA           bool
-	expiration     time.Time
-	duration       time.Duration
-	mutex          sync.Mutex
+	numStories int
+	cache      []item
+	expiration time.Time
+	duration   time.Duration
+	mutex      sync.Mutex
 }
 
 func (sc *storyCache) stories() ([]item, error) {
 	sc.mutex.Lock()
 	defer sc.mutex.Unlock()
-	if time.Since(sc.expiration) < 0 {
-		if sc.useA {
-			return sc.cacheA, nil
-		} else {
-			return sc.cacheB, nil
-		}
+	if time.Now().Sub(sc.expiration) < 0 {
+		return sc.cache, nil
 	}
 	stories, err := getTopStories(sc.numStories)
 	if err != nil {
 		return nil, err
 	}
 	sc.expiration = time.Now().Add(sc.duration)
-	if sc.useA {
-		sc.cacheA = stories
-	} else {
-		sc.cacheB = stories
-		return sc.cacheB, nil
-	}
-	return sc.cacheA, nil
+	sc.cache = stories
+	return sc.cache, nil
 }
 
 func getTopStories(numStories int) ([]item, error) {
 	var client hn.Client
 	ids, err := client.TopItems()
 	if err != nil {
-		return nil, errors.New("failed to load top stories")
+		return nil, errors.New("Failed to load top stories")
 	}
-
 	var stories []item
 	at := 0
 	for len(stories) < numStories {
@@ -139,9 +146,7 @@ func getStories(ids []int) []item {
 			stories = append(stories, res.item)
 		}
 	}
-
 	return stories
-
 }
 
 func isStoryLink(item item) bool {
