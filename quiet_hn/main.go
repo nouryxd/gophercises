@@ -62,7 +62,7 @@ func handler(numStories int, tpl *template.Template) http.HandlerFunc {
 		}
 		data := templateData{
 			Stories: stories,
-			Time:    time.Now().Sub(start),
+			Time:    time.Since(start),
 		}
 		err = tpl.Execute(w, data)
 		if err != nil {
@@ -83,7 +83,7 @@ type storyCache struct {
 func (sc *storyCache) stories() ([]item, error) {
 	sc.mutex.Lock()
 	defer sc.mutex.Unlock()
-	if time.Now().Sub(sc.expiration) < 0 {
+	if time.Since(sc.expiration) < 0 {
 		return sc.cache, nil
 	}
 	stories, err := getTopStories(sc.numStories)
@@ -99,7 +99,7 @@ func getTopStories(numStories int) ([]item, error) {
 	var client hn.Client
 	ids, err := client.TopItems()
 	if err != nil {
-		return nil, errors.New("Failed to load top stories")
+		return nil, errors.New("failed to load top stories")
 	}
 	var stories []item
 	at := 0
