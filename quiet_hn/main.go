@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/lyx0/gophercises/quiet_hn/hn"
@@ -52,11 +53,14 @@ func handler(numStories int, tpl *template.Template) http.HandlerFunc {
 var (
 	cache           []item
 	cacheExpiration time.Time
+	cacheMutex      sync.Mutex
 )
 
 // With cache:		This page was rendered in 2.314µs
 // Without cache:	This page was rendered in 622.08096ms
 func getCachedStories(numStories int) ([]item, error) {
+	cacheMutex.Lock()
+	defer cacheMutex.Unlock()
 	if time.Since(cacheExpiration) < 0 {
 		return cache, nil
 	}
