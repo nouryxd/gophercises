@@ -11,11 +11,25 @@ func main() {
 	mux.HandleFunc("/panic/", panicDemo)
 	mux.HandleFunc("/panic-after/", panicAfterDemo)
 	mux.HandleFunc("/", hello)
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	log.Fatal(http.ListenAndServe(":8080", recoverMw(mux)))
+}
+
+func recoverMw(app http.Handler) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if err := recover(); err != nil {
+				log.Println(err)
+				http.Error(rw, "Something went wrong :(", http.StatusInternalServerError)
+			}
+		}()
+
+		app.ServeHTTP(rw, r)
+	}
 }
 
 func panicDemo(w http.ResponseWriter, r *http.Request) {
 	funcThatPanics()
+
 }
 
 func panicAfterDemo(w http.ResponseWriter, r *http.Request) {
